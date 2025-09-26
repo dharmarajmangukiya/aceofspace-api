@@ -1,0 +1,46 @@
+    name: Deploy API
+
+    on:
+      push:
+        branches:
+          - main # Or your production branch
+
+    jobs:
+      deploy:
+        runs-on: ubuntu-24.04
+
+        steps:
+          # Step 1: Checkout repository
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          # Step 2: Setup Node.js
+          - name: Setup Node.js
+            uses: actions/setup-node@v4
+            with:
+              node-version: '18.19.1'
+
+          # Step 3: Install dependencies
+          - name: Install dependencies
+            run: npm install
+
+          - name: Deploy to server
+            uses: appleboy/ssh-action@master
+            with:
+              host: ${{ secrets.HOST }}
+              username: ${{ secrets.USERNAME }}
+              password: ${{ secrets.PASSWORD }}
+              port: 22
+              script: |
+                cd /var/www/html/aceofspace-api
+
+                echo "Pulling latest code..."
+                git pull origin main
+
+                echo "Installing dependencies..."
+                npm install
+
+                echo "Restart app..."
+                pm2 restart aceofspace-api
+
+                echo "Deployment completed!"
