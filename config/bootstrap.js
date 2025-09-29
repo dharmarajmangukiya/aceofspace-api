@@ -1,30 +1,46 @@
-/**
- * Seed Function
- * (sails.config.bootstrap)
- *
- * A function that runs just before your Sails app gets lifted.
- * > Need more flexibility?  You can also create a hook.
- *
- * For more information on seeding your app with fake data, check out:
- * https://sailsjs.com/config/bootstrap
- */
+const bcrypt = require('bcryptjs');
 
 module.exports.bootstrap = async function() {
+  // 1. Seed roles
+  const defaultRoles = [
+    { name: 'admin', description: 'Full access' },
+    { name: 'agent', description: 'Can list and manage properties' },
+    { name: 'user', description: 'Can browse and book properties' }
+  ];
 
-  // By convention, this is a good place to set up fake data during development.
-  //
-  // For example:
-  // ```
-  // // Set up fake development data (or if we already have some, avast)
-  // if (await User.count() > 0) {
-  //   return;
-  // }
-  //
-  // await User.createEach([
-  //   { emailAddress: 'ry@example.com', fullName: 'Ryan Dahl', },
-  //   { emailAddress: 'rachael@example.com', fullName: 'Rachael Shaw', },
-  //   // etc.
-  // ]);
-  // ```
+  for (let role of defaultRoles) {
+    const exists = await Role.findOne({ name: role.name });
+    if (!exists) {
+      await Role.create(role);
+      sails.log(`✅ Role created: ${role.name}`);
+    }
+  }
 
+  // 2. Seed super admin user
+  const adminRole = await Role.findOne({ name: 'admin' });
+  if (!adminRole) {
+    sails.log.error(' Admin role not found, cannot create super admin');
+    return;
+  }
+
+  const superAdminEmail = 'admin@example.com'; // change as per project
+  const existingAdmin = await User.findOne({ email: superAdminEmail });
+
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash('Admin@123', 10);
+
+    await User.create({
+      firstName: 'Super',
+      lastName: 'Admin',
+      email: superAdminEmail,
+      password: hashedPassword,
+      role: adminRole.id
+    });
+
+    sails.log(`Super Admin created (email: ${superAdminEmail}, password: Admin@123)`);
+  } else {
+    sails.log('Super Admin already exists');
+  }
+
+  sails.log('Seeding complete');
 };

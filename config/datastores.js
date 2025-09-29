@@ -51,6 +51,12 @@ module.exports.datastores = {
     // adapter: 'sails-mysql',
     // url: 'mysql://user:password@host:port/database',
 
+    adapter: 'sails-mongo',
+    url: 'mongodb://localhost:27017/aceofspace-api', // for development
+    // url: 'mongodb+srv://<username>:<password>@cluster0.xxxx.mongodb.net/mydb?retryWrites=true&w=majority' // for production
+
+
+
   },
 
 
