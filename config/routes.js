@@ -25,8 +25,7 @@ module.exports.routes = {
 
 
 
-   // Auth
-
+  // Auth
   //  'POST /api/auth/register': 'AuthController.register',
   //  'POST /auth/verify-otp': 'AuthController.verifyOtp',
   //  'POST /auth/login': 'AuthController.login',
@@ -34,6 +33,9 @@ module.exports.routes = {
   [`POST ${API_PREFIX}/auth/register`]: 'AuthController.register',
   [`POST ${API_PREFIX}/auth/verify-otp`]: 'AuthController.verifyOtp',
   [`POST ${API_PREFIX}/auth/login`]: 'AuthController.login',
+  [`POST ${API_PREFIX}/auth/resend-otp`]: 'AuthController.resendOtp',
+
+
 
   // User
   [`GET ${API_PREFIX}/user/profile`]: 'UserController.profile',
