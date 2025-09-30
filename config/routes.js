@@ -8,6 +8,8 @@
  * https://sailsjs.com/anatomy/config/routes-js
  */
 
+const API_PREFIX = '/api';
+
 module.exports.routes = {
 
   /***************************************************************************
@@ -19,7 +21,33 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': { view: 'pages/homepage' },
+  // '/': { view: 'pages/homepage' },
+
+
+
+   // Auth
+
+  //  'POST /api/auth/register': 'AuthController.register',
+  //  'POST /auth/verify-otp': 'AuthController.verifyOtp',
+  //  'POST /auth/login': 'AuthController.login',
+
+  [`POST ${API_PREFIX}/auth/register`]: 'AuthController.register',
+  [`POST ${API_PREFIX}/auth/verify-otp`]: 'AuthController.verifyOtp',
+  [`POST ${API_PREFIX}/auth/login`]: 'AuthController.login',
+
+  // User
+  [`GET ${API_PREFIX}/user/profile`]: 'UserController.profile',
+  [`PUT ${API_PREFIX}/user/update`]: 'UserController.updateProfile',
+  [`POST ${API_PREFIX}/user/change-password`]: 'UserController.changePassword',
+
+
+  // Properties
+  [`POST ${API_PREFIX}/property`]: { controller: 'PropertyController', action: 'create', policy: 'isAuthenticated' },
+  [`GET ${API_PREFIX}/property`]: 'PropertyController.list',
+  [`GET ${API_PREFIX}/property/my`]: { controller: 'PropertyController', action: 'myProperties', policy: 'isAuthenticated' },
+
+  // Admin
+  [`GET ${API_PREFIX}/admin/users`]: 'UserController.list',
 
 
   /***************************************************************************
