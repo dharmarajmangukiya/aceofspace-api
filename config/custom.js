@@ -8,6 +8,15 @@
  * https://sailsjs.com/config/custom
  */
 
+require('dotenv').config();
+
+if (!process.env.JWT_SECRET) {
+  console.error(' JWT_SECRET is missing. Current env keys:', Object.keys(process.env));
+
+  throw new Error('JWT_SECRET is missing in .env');
+}
+
+
 module.exports.custom = {
 
   /***************************************************************************
@@ -17,6 +26,7 @@ module.exports.custom = {
   ***************************************************************************/
 
   jwtSecret: process.env.JWT_SECRET || 'fallbackSecretKey',
+
   email: {
     service: 'smtp',   // or 'smtp', 'zoho', 'outlook', etc.
     auth: {

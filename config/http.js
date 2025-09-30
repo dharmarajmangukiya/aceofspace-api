@@ -29,18 +29,6 @@ module.exports.http = {
     *                                                                          *
     ***************************************************************************/
 
-    // order: [
-    //   'cookieParser',
-    //   'session',
-    //   'bodyParser',
-    //   'compress',
-    //   'poweredBy',
-    //   'router',
-    //   'www',
-    //   'favicon',
-    // ],
-
-
     /***************************************************************************
     *                                                                          *
     * The body parser that will handle incoming multipart HTTP requests.       *
@@ -54,6 +42,42 @@ module.exports.http = {
     //   var middlewareFn = skipper({ strict: true });
     //   return middlewareFn;
     // })(),
+
+
+    // order: [
+    //   'addApiPrefix',
+    //   'cookieParser',
+    //   'session',
+    //   'bodyParser',
+    //   'compress',
+    //   'poweredBy',
+    //   'router',
+    //   'www',
+    //   'favicon',
+    // ],
+
+    // // Middleware to add /api prefix
+    // addApiPrefix: function (req, res, next) {
+    //   // Avoid double prefixing if already starts with /api
+    //   if (req.url.startsWith('/api/')) {
+    //     return next();
+    //   }
+
+    //   // Only prefix API calls (not assets like /images, /css, etc.)
+    //   if (
+    //     req.url.startsWith('/auth') ||
+    //     req.url.startsWith('/user') ||
+    //     req.url.startsWith('/admin') ||
+    //     req.url.startsWith('/property')
+    //   ) {
+    //     req.url = '/api' + req.url;
+    //   }
+
+    //   return next();
+    // },
+
+
+
 
   },
 
