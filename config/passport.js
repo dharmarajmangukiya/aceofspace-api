@@ -5,9 +5,9 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const bcrypt = require('bcrypt');
 
 const jwtOptions = {
-	jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-	"secretOrKey": 'waterminderprivatekey',
-	"refreshTokenSecret": "REFRESH_TOKEN_SECRET"
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  'secretOrKey': 'mySuperSecretKey123',
+  'refreshTokenSecret': 'REFRESH_TOKEN_SECRET'
 };
 
 passport.serializeUser(function (user, cb) {

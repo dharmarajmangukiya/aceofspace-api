@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
+// const { jwtOptions } = require('../../config/passport'); // make sure path is correct
 
 module.exports = {
   /**
@@ -72,7 +73,7 @@ module.exports = {
         otpExpiry,
       }).fetch();
 
-      delete newUser.password;
+      // delete newUser.password;
 
       return ResponseService.success(
         'Registration successful. Please verify OTP sent to your email.',
@@ -126,6 +127,7 @@ module.exports = {
   /**
    * Login user
    */
+
   login: async ({ email, password }) => {
     try {
       if (!email) return ResponseService.fail('Please enter email');
@@ -138,26 +140,38 @@ module.exports = {
         return ResponseService.fail('Account not verified. Please verify OTP.');
       }
 
+      // Validate password
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) return ResponseService.fail('Invalid email or password');
 
-      const jwtSecret = sails.config.custom.jwtSecret;
-      if (!jwtSecret) return ResponseService.fail('JWT secret not configured');
+      // Use secrets from config
+      const jwtSecret = sails.config.custom.jwtSecret || 'mySuperSecretKey123';
+      const refreshTokenSecret = sails.config.custom.refreshTokenSecret || 'REFRESH_TOKEN_SECRET';
 
-      const token = jwt.sign(
-        { id: user.id, role: user.role ? user.role.name : null },
-        jwtSecret,
-        { expiresIn: '7d' }
-      );
+      // Prepare payload
+      const payload = {
+        userId: user.id,
+        role: user.role ? user.role.name : null
+      };
 
+      // Generate tokens
+      const accessToken = jwt.sign(payload, jwtSecret, { expiresIn: '7d' });
+      const refreshToken = jwt.sign(payload, refreshTokenSecret, { expiresIn: '30d' });
+
+      // Remove sensitive info
       delete user.password;
 
-      return ResponseService.success('Login successful', { token, user });
+      return ResponseService.success('Login successful', {
+        token: accessToken,
+        refreshToken,
+        user
+      });
     } catch (err) {
       sails.log.error(err);
       return ResponseService.fail('Something went wrong during login');
     }
   },
+
 
   /**
    * Resend otp
@@ -203,6 +217,84 @@ module.exports = {
     } catch (err) {
       sails.log.error('Resend OTP error:', err);
       return ResponseService.fail('Something went wrong while resending OTP');
+    }
+  },
+
+  /**
+   * Forgot Password
+   */
+  forgotPassword: async ({ email }) => {
+    try {
+      if (!email) return ResponseService.fail('Email is required');
+
+      const user = await User.findOne({ email });
+      if (!user) return ResponseService.fail('User not found');
+
+      // Generate reset token
+      const resetToken = crypto.randomBytes(20).toString('hex');
+      const resetExpiry = Date.now() + 60 * 60 * 1000; // 1 hour
+
+      // Save reset token in DB
+      await User.updateOne({ id: user.id }).set({
+        resetToken,
+        resetExpiry,
+      });
+
+      // Send reset link via email
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+
+      const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Password Reset Request',
+        html: `<p>Click below link to reset your password (valid for 1 hour):</p>
+               <a href="${resetLink}">${resetLink}</a>`,
+      });
+
+      return ResponseService.success('Password reset link sent to your email');
+    } catch (err) {
+      sails.log.error('Forgot Password Error:', err);
+      return ResponseService.fail('Something went wrong while requesting password reset');
+    }
+  },
+
+  /**
+   * Reset Password
+   */
+  resetPassword: async ({ token, newPassword }) => {
+    try {
+      if (!token) return ResponseService.fail('Reset token is required');
+      if (!newPassword) return ResponseService.fail('New password is required');
+      if (newPassword.length < 6) return ResponseService.fail('Password must be at least 6 characters');
+
+      const user = await User.findOne({ resetToken: token });
+      if (!user) return ResponseService.fail('Invalid or expired reset token');
+
+      if (Date.now() > user.resetExpiry) {
+        return ResponseService.fail('Reset token expired');
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      await User.updateOne({ id: user.id }).set({
+        password: hashedPassword,
+        resetToken: null,
+        resetExpiry: null,
+      });
+
+      return ResponseService.success('Password reset successfully');
+    } catch (err) {
+      sails.log.error('Reset Password Error:', err);
+      return ResponseService.fail('Something went wrong while resetting password');
     }
   },
 

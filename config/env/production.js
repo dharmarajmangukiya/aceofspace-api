@@ -150,10 +150,10 @@ module.exports = {
     ***************************************************************************/
     cors: {
       allRoutes: true, // Enable CORS for all routes
-        allowOrigins: ['http://settlewise.in'], // Specify origins allowed to access the server
-        allowCredentials: true, // Allow sending cookies from the browser to the server
-        allowRequestHeaders: 'content-type,authorization', // Allow specific headers in the request
-        allowRequestMethods: 'GET,POST,PUT,DELETE,OPTIONS,HEAD' // Allow specific HTTP methods
+      allowOrigins: ['http://settlewise.in'], // Specify origins allowed to access the server
+      allowCredentials: true, // Allow sending cookies from the browser to the server
+      allowRequestHeaders: 'content-type,authorization', // Allow specific headers in the request
+      allowRequestMethods: 'GET,POST,PUT,DELETE,OPTIONS,HEAD' // Allow specific HTTP methods
     },
 
     allRoutes: true,
@@ -270,7 +270,7 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     onlyAllowOrigins: [
-        'http://settlewise.in'
+      'http://settlewise.in'
     ],
 
 
