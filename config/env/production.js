@@ -72,7 +72,7 @@ module.exports = {
       ****************************************************************************/
       // ssl: { rejectUnauthorized: true },
       adapter: 'sails-mongo',
-      url: 'mongodb://root:Welcome1234!@72.60.99.188:27017/?directConnection=true&serverSelectionTimeoutMS=10000&authSource=admin&appName=mongosh+2.5.8',
+      url: 'mongodb://root:Welcome1234!@72.60.99.188:27017/admin'
     },
 
   },
