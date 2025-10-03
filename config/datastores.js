@@ -13,26 +13,6 @@
  * https://sailsjs.com/config/datastores
  */
 
-
-require('dotenv').config();
-
-const NODE_ENV = process.env.NODE_ENV || 'development';
-
-let mongoUrl;
-
-// Validate Mongo URLs
-if (NODE_ENV === 'production') {
-  if (!process.env.MONGO_PROD) {
-    throw new Error('MONGO_PROD is missing in .env for production environment');
-  }
-  mongoUrl = process.env.MONGO_PROD;
-} else {
-  if (!process.env.MONGO_LOCAL) {
-    throw new Error('MONGO_LOCAL is missing in .env for development environment');
-  }
-  mongoUrl = process.env.MONGO_LOCAL;
-}
-
 module.exports.datastores = {
 
 
@@ -70,11 +50,6 @@ module.exports.datastores = {
     ***************************************************************************/
     // adapter: 'sails-mysql',
     // url: 'mysql://user:password@host:port/database',
-
-    adapter: 'sails-mongo',
-    url: mongoUrl,
-
-    // url: 'mongodb://localhost:27017/aceofspace-api', // for development
 
   },
 

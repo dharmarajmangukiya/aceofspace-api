@@ -71,7 +71,8 @@ module.exports = {
       *                                                                           *
       ****************************************************************************/
       // ssl: { rejectUnauthorized: true },
-
+      adapter: 'sails-mongo',
+      url: 'mongodb://root:Welcome1234!@72.60.99.188:27017/?directConnection=true&serverSelectionTimeoutMS=10000&authSource=admin&appName=mongosh+2.5.8',
     },
 
   },
@@ -148,10 +149,14 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     cors: {
-      // allowOrigins: [
-      //   'https://example.com',
-      // ]
+      allRoutes: true, // Enable CORS for all routes
+        allowOrigins: ['http://settlewise.in'], // Specify origins allowed to access the server
+        allowCredentials: true, // Allow sending cookies from the browser to the server
+        allowRequestHeaders: 'content-type,authorization', // Allow specific headers in the request
+        allowRequestMethods: 'GET,POST,PUT,DELETE,OPTIONS,HEAD' // Allow specific HTTP methods
     },
+
+    allRoutes: true,
 
   },
 
@@ -236,10 +241,9 @@ module.exports = {
     *                                                                          *
     ***************************************************************************/
     cookie: {
-      // secure: true,
+      secure: true,
       maxAge: 24 * 60 * 60 * 1000,  // 24 hours
     },
-
   },
 
 
@@ -265,10 +269,9 @@ module.exports = {
     * > Be sure to use the right protocol!  ("http://" vs. "https://")         *
     *                                                                          *
     ***************************************************************************/
-    // onlyAllowOrigins: [
-    //   'https://example.com',
-    //   'https://staging.example.com',
-    // ],
+    onlyAllowOrigins: [
+        'http://settlewise.in'
+    ],
 
 
     /***************************************************************************
@@ -355,7 +358,7 @@ module.exports = {
   * this, just try deploying without setting it and see if it works.)       *
   *                                                                         *
   ***************************************************************************/
-  port: process.env.PORT || 27017,
+  // port: 80
 
 
 

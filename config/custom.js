@@ -8,15 +8,6 @@
  * https://sailsjs.com/config/custom
  */
 
-require('dotenv').config();
-
-if (!process.env.JWT_SECRET) {
-  console.error(' JWT_SECRET is missing. Current env keys:', Object.keys(process.env));
-
-  throw new Error('JWT_SECRET is missing in .env');
-}
-
-
 module.exports.custom = {
 
   /***************************************************************************
@@ -24,17 +15,6 @@ module.exports.custom = {
   * Any other custom config this Sails app should use during development.    *
   *                                                                          *
   ***************************************************************************/
-
-  jwtSecret: process.env.JWT_SECRET || 'fallbackSecretKey',
-
-  email: {
-    service: 'smtp',   // or 'smtp', 'zoho', 'outlook', etc.
-    auth: {
-      user: process.env.EMAIL_USER, // your email
-      pass: process.env.EMAIL_PASS  // your app password (NOT Gmail login password)
-    }
-  }
-
   // sendgridSecret: 'SG.fake.3e0Bn0qSQVnwb1E4qNPz9JZP5vLZYqjh7sn8S93oSHU',
   // stripeSecret: 'sk_test_Zzd814nldl91104qor5911gjald',
   // …
