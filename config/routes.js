@@ -33,7 +33,11 @@ module.exports.routes = {
   [`POST ${API_PREFIX}/auth/register`]: 'AuthController.register',
   [`POST ${API_PREFIX}/auth/verify-otp`]: 'AuthController.verifyOtp',
   [`POST ${API_PREFIX}/auth/login`]: 'AuthController.login',
+  [`POST ${API_PREFIX}/auth/resend-otp`]: 'AuthController.forgotPassword',
   [`POST ${API_PREFIX}/auth/resend-otp`]: 'AuthController.resendOtp',
+  [`POST ${API_PREFIX}/auth/forgot-password`]: 'AuthController.forgotPassword',
+  [`POST ${API_PREFIX}/auth/reset-password`]: 'AuthController.resetPassword',
+
 
 
 
