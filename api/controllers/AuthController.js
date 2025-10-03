@@ -14,4 +14,8 @@ module.exports = {
     const response = await AuthService.login(req.body);
     return res.json(response);
   },
+  resendOtp: async (req, res) => {
+    const response = await AuthService.resendOtp(req.body);
+    return res.json(response);
+  },
 };

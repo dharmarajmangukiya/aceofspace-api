@@ -131,4 +131,7 @@ lib-cov
 *.log
 *.out
 *.pid
+# Ignore environment files
+.env
+
 
