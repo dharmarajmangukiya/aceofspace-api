@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
-// const { jwtOptions } = require('../../config/passport'); // make sure path is correct
+const crypto = require('crypto');
 
 module.exports = {
   /**
@@ -73,11 +73,11 @@ module.exports = {
         otpExpiry,
       }).fetch();
 
-      // delete newUser.password;
+      delete newUser.password;
 
       return ResponseService.success(
         'Registration successful. Please verify OTP sent to your email.',
-        { id: newUser.id, email: newUser.email,otp: newUser.otp }
+        { id: newUser.id, email: newUser.email,otp: otp }
       );
     } catch (err) {
       sails.log.error(err);

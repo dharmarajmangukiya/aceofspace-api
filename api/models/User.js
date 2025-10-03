@@ -9,6 +9,8 @@ module.exports = {
     email: { type: 'string', required: true, unique: true, isEmail: true },
     password: { type: 'string', required: true, protect: true },
     isActive: { type: 'boolean', defaultsTo: false },
+    otp: { type: 'string', allowNull: true },
+    otpExpiry: { type: 'number', allowNull: true },
     resetToken: { type: 'string', allowNull: true },
     resetTokenExpiry: { type: 'number', allowNull: true },
 
