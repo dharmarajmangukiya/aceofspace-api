@@ -47,6 +47,17 @@ module.exports.routes = {
   [`POST ${API_PREFIX}/user/change-password`]: 'UserController.changePassword',
 
 
+  // ============================
+  // USER KYC ROUTES
+  // ============================
+  [`POST ${API_PREFIX}/kyc/upload`]: 'KycController.upload',
+
+  // ============================
+  // ADMIN KYC ROUTES
+  // ============================
+  [`GET ${API_PREFIX}/admin/kyc/pending`]: 'KycController.listPending',
+  [`PUT ${API_PREFIX}/admin/kyc/update/:id`]: 'KycController.updateStatus',
+
   // Properties
   [`POST ${API_PREFIX}/property`]: { controller: 'PropertyController', action: 'create', policy: 'isAuthenticated' },
   [`GET ${API_PREFIX}/property`]: 'PropertyController.list',
