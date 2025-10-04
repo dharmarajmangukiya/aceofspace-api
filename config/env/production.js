@@ -150,7 +150,8 @@ module.exports = {
     ***************************************************************************/
     cors: {
       allRoutes: true, // Enable CORS for all routes
-      allowOrigins: ['http://settlewise.in','http://localhost:3000/'], // Specify origins allowed to access the server
+      allowOrigins: [ 'http://settlewise.in',
+        'http://localhost:3000'], // Specify origins allowed to access the server
       allowCredentials: true, // Allow sending cookies from the browser to the server
       allowRequestHeaders: 'content-type,authorization', // Allow specific headers in the request
       allowRequestMethods: 'GET,POST,PUT,DELETE,OPTIONS,HEAD' // Allow specific HTTP methods

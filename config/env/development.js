@@ -73,7 +73,8 @@ module.exports = {
       // ssl: { rejectUnauthorized: true },
 
       adapter: 'sails-mongo',
-      url: 'mongodb://root:Welcome1234!@72.60.99.188:27017/admin',
+      // url: 'mongodb://root:Welcome1234!@72.60.99.188:27017/admin',
+      url: 'mongodb://localhost:27017/aceofspace-api',
 
     },
 
