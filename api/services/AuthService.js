@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const EmailService = require('../services/EmailService');
+
 
 module.exports = {
   /**
@@ -51,15 +53,18 @@ module.exports = {
 
       // ---------------- Generate OTP ----------------
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const otpExpiry = Date.now() + 60 * 1000; // 1 min expiry
+      const otpExpiry = Date.now() + 5 * 60 * 1000;
 
-      // ---------------- Try sending email FIRST ----------------
-      // try {
-      //   await sendOtpMail(email, otp);
-      // } catch (mailErr) {
-      //   sails.log.error('OTP Mail sending failed:', mailErr);
-      //   return ResponseService.fail('Could not send OTP email. Please try again later.');
-      // }
+
+      try {
+        await EmailService.sendOtp(email, otp);
+      } catch (mailErr) {
+        sails.log.error('OTP email sending failed:', mailErr);
+        return res.json(ResponseService.fail('Could not send OTP email. Please try again later.'));
+      }
+
+
+
 
       // ---------------- Only if mail is sent, create user ----------------
       const newUser = await User.create({
@@ -77,7 +82,8 @@ module.exports = {
 
       return ResponseService.success(
         'Registration successful. Please verify OTP sent to your email.',
-        { id: newUser.id, email: newUser.email,otp: otp }
+        // { id: newUser.id, email: newUser.email,otp: otp }
+        { id: newUser.id, email: newUser.email }
       );
     } catch (err) {
       sails.log.error(err);
@@ -187,10 +193,16 @@ module.exports = {
         return ResponseService.fail('User not found');
       }
 
-      // Generate new OTP & expiry (60 sec)
+      // ---------------- Generate OTP ----------------
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const otpExpiry = Date.now() + 60 * 1000;
+      const otpExpiry = Date.now() + 5 * 60 * 1000;
 
+      try {
+        await EmailService.sendOtp(email, otp);
+      } catch (mailErr) {
+        sails.log.error('OTP email sending failed:', mailErr);
+        return res.json(ResponseService.fail('Could not send OTP email. Please try again later.'));
+      }
       // Update user
       const updatedUser = await User.updateOne({ id: user.id }).set({
         otp,
@@ -202,17 +214,10 @@ module.exports = {
         return ResponseService.fail('Failed to update user with OTP');
       }
 
-      // Send OTP email
-      // await MailerService.sendMail({
-      //   to: user.email,
-      //   subject: "Your OTP Code",
-      //   text: `Your OTP is: ${otp} (valid for 60 seconds).`,
-      // });
-
       delete updatedUser.password; // hide password
 
       // return ResponseService.success('OTP resent successfully', updatedUser);
-      return ResponseService.success('OTP resent successfully', { otp });
+      return ResponseService.success('OTP resent successfully');
 
     } catch (err) {
       sails.log.error('Resend OTP error:', err);
