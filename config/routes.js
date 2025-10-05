@@ -58,10 +58,17 @@ module.exports.routes = {
   [`GET ${API_PREFIX}/admin/kyc/pending`]: 'KycController.listPending',
   [`PUT ${API_PREFIX}/admin/kyc/update/:id`]: 'KycController.updateStatus',
 
+
   // Properties
-  [`POST ${API_PREFIX}/property`]: { controller: 'PropertyController', action: 'create', policy: 'isAuthenticated' },
-  [`GET ${API_PREFIX}/property`]: 'PropertyController.list',
-  [`GET ${API_PREFIX}/property/my`]: { controller: 'PropertyController', action: 'myProperties', policy: 'isAuthenticated' },
+  [`POST ${API_PREFIX}/property/add`]: 'PropertyController.add',
+  [`POST ${API_PREFIX}/property/upload-image`]: 'PropertyController.uploadImage',
+  [`GET ${API_PREFIX}/property/my`]: 'PropertyController.myProperties',
+  [`GET ${API_PREFIX}/property/list`]: 'PropertyController.list',
+  [`GET ${API_PREFIX}/property/:id`]: 'PropertyController.detail',
+
+  // [`POST ${API_PREFIX}/property`]: { controller: 'PropertyController', action: 'create', policy: 'isAuthenticated' },
+  // [`GET ${API_PREFIX}/property`]: 'PropertyController.list',
+  // [`GET ${API_PREFIX}/property/my`]: { controller: 'PropertyController', action: 'myProperties', policy: 'isAuthenticated' },
 
   // Admin
   [`GET ${API_PREFIX}/admin/users`]: 'UserController.list',

@@ -16,7 +16,9 @@ module.exports = {
 
 
     role: { model: 'role' },   // relation
+    properties: { collection: 'property', via: 'owner' },
     // properties: { collection: 'property', via: 'owner' }, causing your error
+
   },
 
   customToJSON: function () {

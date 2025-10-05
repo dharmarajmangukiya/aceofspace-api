@@ -30,11 +30,18 @@ module.exports.policies = {
       '*': 'isAuthenticated',   // all actions need token
       list: ['isAuthenticated', 'isAdmin'] // custom policy for admin
     },
-    // ✅ Protect KYC routes
+    // Protect KYC routes
     KycController: {
       upload: 'isAuthenticated',   // users must be logged in
       listPending: ['isAuthenticated', 'isAdmin'], // admin-only
       updateStatus: ['isAuthenticated', 'isAdmin'] // admin-only
-    }
+    },
+    PropertyController: {
+      add: 'isAuthenticated',
+      myProperties: 'isAuthenticated',
+      list: true,
+      detail: true,
+      uploadImage: 'isAuthenticated',
+    },
 
 };
