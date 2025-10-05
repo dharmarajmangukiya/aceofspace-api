@@ -19,4 +19,7 @@ module.exports.custom = {
   // stripeSecret: 'sk_test_Zzd814nldl91104qor5911gjald',
   // …
 
+  frontendUrl: 'http://settlewise.in', // change to your actual frontend URL
+
+
 };

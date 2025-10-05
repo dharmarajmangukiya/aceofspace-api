@@ -225,9 +225,11 @@ module.exports = {
     }
   },
 
+
   /**
-   * Forgot Password
-   */
+ * Forgot Password
+ */
+
   forgotPassword: async ({ email }) => {
     try {
       if (!email) return ResponseService.fail('Email is required');
@@ -235,66 +237,90 @@ module.exports = {
       const user = await User.findOne({ email });
       if (!user) return ResponseService.fail('User not found');
 
-      // Generate reset token
+      // Generate reset token and expiry (valid for 5 mins)
       const resetToken = crypto.randomBytes(20).toString('hex');
-      const resetExpiry = Date.now() + 60 * 60 * 1000; // 1 hour
+      const resetTokenExpiry = Date.now() + 5 * 60 * 1000;
 
-      // Save reset token in DB
       await User.updateOne({ id: user.id }).set({
         resetToken,
-        resetExpiry,
+        resetTokenExpiry,
       });
 
-      // Send reset link via email
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+      // Reset link using sails.config.custom.frontendUrl
+      const resetLink = `${sails.config.custom.frontendUrl}/auth/reset-password?token=${resetToken}`;
 
-      const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+      // Send mail
+      try {
+        await EmailService.sendMail(
+          email,
+          'Password Reset Request',
+          `
+            <p>Hello ${user.firstName || 'User'},</p>
+            <p>Click the link below to reset your password (valid for 5 minutes):</p>
+            <a href="${resetLink}" target="_blank">${resetLink}</a>
+            <p>If you did not request this, ignore this email.</p>
+          `
+        );
+      } catch (mailErr) {
+        sails.log.error('Reset password email failed:', mailErr);
+        return ResponseService.fail('Could not send password reset email.');
+      }
 
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Password Reset Request',
-        html: `<p>Click below link to reset your password (valid for 1 hour):</p>
-               <a href="${resetLink}">${resetLink}</a>`,
-      });
 
-      return ResponseService.success('Password reset link sent to your email');
+
+      return ResponseService.success('Password reset link sent to your email.');
     } catch (err) {
       sails.log.error('Forgot Password Error:', err);
-      return ResponseService.fail('Something went wrong while requesting password reset');
+      return ResponseService.fail('Something went wrong while requesting password reset.');
     }
   },
+
+
+
 
   /**
    * Reset Password
    */
-  resetPassword: async ({ token, newPassword }) => {
+  resetPassword: async ({ email, token, password }) => {
     try {
+      // ---------- Basic Validations ----------
+      if (!email) return ResponseService.fail('Email is required');
       if (!token) return ResponseService.fail('Reset token is required');
-      if (!newPassword) return ResponseService.fail('New password is required');
-      if (newPassword.length < 6) return ResponseService.fail('Password must be at least 6 characters');
+      if (!password) return ResponseService.fail('New password is required');
+      if (password.length < 6) return ResponseService.fail('Password must be at least 6 characters');
 
-      const user = await User.findOne({ resetToken: token });
+      // ---------- Find User ----------
+      const user = await User.findOne({ email, resetToken: token });
       if (!user) return ResponseService.fail('Invalid or expired reset token');
 
+      // ---------- Check Token Expiry ----------
       if (Date.now() > user.resetExpiry) {
-        return ResponseService.fail('Reset token expired');
+        return ResponseService.fail('Reset token has expired');
       }
 
-      // Hash new password
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-
+      // ---------- Hash & Update Password ----------
+      const hashedPassword = await bcrypt.hash(password, 10);
       await User.updateOne({ id: user.id }).set({
         password: hashedPassword,
         resetToken: null,
         resetExpiry: null,
       });
+
+      // ---------- Send Confirmation Email ----------
+      try {
+        await EmailService.sendMail(
+          email,
+          'Password Changed Successfully',
+          `
+            <p>Hello ${user.firstName || 'User'},</p>
+            <p>Your password has been changed successfully.</p>
+            <p>If you did not perform this action, please contact support immediately.</p>
+          `
+        );
+      } catch (mailErr) {
+        sails.log.error('Password change confirmation email failed:', mailErr);
+        // don’t fail the response because password reset already succeeded
+      }
 
       return ResponseService.success('Password reset successfully');
     } catch (err) {
@@ -302,6 +328,7 @@ module.exports = {
       return ResponseService.fail('Something went wrong while resetting password');
     }
   },
+
 
 };
 
