@@ -24,4 +24,24 @@ module.exports = {
       throw new Error('Error sending email: ' + err.message);
     }
   },
+
+  sendMail: async function (to, subject, htmlContent) {
+    const transporter = nodemailer.createTransport(sails.config.email);
+
+    let mailOptions = {
+      from: sails.config.email.from,
+      to: to,
+      subject: subject,
+      html: htmlContent
+    };
+
+    try {
+      return await transporter.sendMail(mailOptions);
+    } catch (error) {
+      sails.log.error('Error sending email:', error);
+      throw new Error('Error sending email: ' + error.message);
+    }
+  },
+
 };
+
