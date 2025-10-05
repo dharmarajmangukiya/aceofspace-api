@@ -21,7 +21,13 @@ module.exports = async function (req, res, proceed) {
     }
 
     // decoded payload should contain userId
-    const user = await User.findOne({ id: decoded.userId }).populate('role');
+    // const user = await User.findOne({ id: decoded.userId }).populate('role');
+    // const user = await User.findOne({ id: decoded.id || decoded.userId });
+
+    const user = await User.findOne({ id: decoded.id || decoded.userId }).populate('role');
+
+    // sails.log(user);
+
     if (!user) {
       return res.json(ResponseService.fail('User not found'));
     }
