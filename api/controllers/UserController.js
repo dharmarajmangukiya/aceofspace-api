@@ -6,20 +6,43 @@ module.exports = {
    * Get logged-in user's profile
    * Token is checked via `isAuthenticated` policy
    */
+
   profile: async function (req, res) {
     try {
       // req.user is populated by isAuthenticated policy
       const user = req.user;
 
+      // Fetch latest KYC details for this user
+      const kyc = await Kyc.find({ userId: user.id })
+        .sort('createdAt DESC')
+        .limit(1);
+
+      // Prepare KYC data
+      const kycInfo = kyc.length > 0 ? {
+        documentType: kyc[0].documentType,
+        documentNumber: kyc[0].documentNumber,
+        documentFile: kyc[0].documentFile,
+        status: kyc[0].status,
+        remark: kyc[0].remark || null,
+        uploadedAt: kyc[0].createdAt
+      } : null;
+
+      // Merge user + KYC details
+      const profileData = {
+        ...user,
+        kyc: kycInfo
+      };
+
       return res.json(ResponseService.success(
         'Profile fetched successfully',
-        user
+        profileData
       ));
     } catch (err) {
       sails.log.error('Profile fetch error:', err);
       return res.json(ResponseService.fail('Something went wrong while fetching profile'));
     }
   },
+
 
   /**
    * Update user profile
