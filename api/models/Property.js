@@ -1,25 +1,88 @@
 module.exports = {
   primaryKey: 'id',
-  schema: true,
   attributes: {
-    id: { type: 'string', columnName: '_id' }, // Mongo ObjectId
+    id: { type: 'string', columnName: '_id' },
 
-    title: { type: 'string', required: true },
+    // Common
+    owner: { model: 'user', required: true },
+    propertyType: { type: 'string', isIn: ['residential', 'commercial'], required: true },
+    subType: { type: 'string', allowNull: true },
+    address: { type: 'string', required: true },
+    city: { type: 'string', required: true },
+    state: { type: 'string', required: true },
+    pincode: { type: 'number', required: true },
+    status: { type: 'string', defaultsTo: 'pending' },
+
+    // 🏠 Residential
+    houseNo: { type: 'string', allowNull: true },
+    apartmentName: { type: 'string', allowNull: true },
+    area: { type: 'string', allowNull: true },
+    landmark: { type: 'string', allowNull: true },
+    bedrooms: { type: 'number', allowNull: true },
+    bathrooms: { type: 'number', allowNull: true },
+    balconies: { type: 'number', allowNull: true },
+    livingRooms: { type: 'number', allowNull: true },
+    otherRooms: { type: 'json', columnType: 'array', defaultsTo: [] },
+    carpetArea: { type: 'number', allowNull: true },
+    builtUpArea: { type: 'number', allowNull: true },
+    clearHeight: { type: 'number', allowNull: true },
+    furnishing: { type: 'string', allowNull: true },
+    specifications: { type: 'string', allowNull: true },
+    totalFloors: { type: 'number', allowNull: true },
+    propertyOnFloor: { type: 'number', allowNull: true },
+    ageOfProperty: { type: 'string', allowNull: true },
+    availableFrom: { type: 'string', allowNull: true },
+    expectedRent: { type: 'number', allowNull: true },
+    maintenance: { type: 'number', allowNull: true },
+    priceNegotiation: { type: 'boolean', defaultsTo: false },
+    bookingAmount: { type: 'number', allowNull: true },
+    membershipCharge: { type: 'number', allowNull: true },
     description: { type: 'string', allowNull: true },
-    type: { type: 'string', isIn: ['residential', 'commercial'], required: true },
-    price: { type: 'number', required: true },
-    location: { type: 'string', required: true },
-    status: { type: 'string', isIn: ['available', 'sold'], defaultsTo: 'available' },
-    images: { type: 'json', columnType: 'array', defaultsTo: [] },
+    securityDeposit: { type: 'string', allowNull: true },
+    durationOfAgreement: { type: 'string', allowNull: true },
+    noticePeriod: { type: 'string', allowNull: true },
+    coveredParking: { type: 'number', allowNull: true },
+    openParking: { type: 'number', allowNull: true },
+    facing: { type: 'string', allowNull: true },
+    facingDetails: { type: 'string', allowNull: true },
 
-    owner: { model: 'user', required: true }, // Relation to user
+    // 🏢 Commercial
+    areaFromGoogle: { type: 'string', allowNull: true },
+    officeNo: { type: 'string', allowNull: true },
+    buildingName: { type: 'string', allowNull: true },
+    zone: { type: 'string', allowNull: true },
+    locationInside: { type: 'string', allowNull: true },
+    superBuiltUpArea: { type: 'number', allowNull: true },
+    entranceWidth: { type: 'number', allowNull: true },
+    flooring: { type: 'string', allowNull: true },
+    noOfCabins: { type: 'number', allowNull: true },
+    maxSeats: { type: 'number', allowNull: true },
+    meetingRooms: { type: 'number', allowNull: true },
+    conferenceRooms: { type: 'number', allowNull: true },
+    privateWashrooms: { type: 'number', allowNull: true },
+    sharedWashrooms: { type: 'number', allowNull: true },
+    receptionArea: { type: 'boolean', allowNull: true },
+    pantryType: { type: 'string', allowNull: true },
+    facilities: { type: 'json', columnType: 'array', defaultsTo: [] },
+    fireSafetyMeasures: { type: 'json', columnType: 'array', defaultsTo: [] },
+
+    yourFloorNo: { type: 'number', allowNull: true },
+    staircases: { type: 'number', allowNull: true },
+    parking: { type: 'string', allowNull: true },
+    lockInPeriod: { type: 'string', allowNull: true },
+    yearlyRentIncrease: { type: 'string', allowNull: true },
+    amenities: { type: 'json', columnType: 'array', defaultsTo: [] },
+
+
+    // Media
+    images: { type: 'json', columnType: 'array', defaultsTo: [] },
+    video: { type: 'string', allowNull: true },
 
     createdAt: { type: 'ref', columnType: 'datetime', autoCreatedAt: true },
     updatedAt: { type: 'ref', columnType: 'datetime', autoUpdatedAt: true },
   },
 
   customToJSON: function () {
-    // automatically format createdAt/updatedAt as dd-mm-yyyy
     const formatted = this;
     if (this.createdAt) {
       const d = new Date(this.createdAt);
@@ -32,3 +95,4 @@ module.exports = {
     return formatted;
   }
 };
+
