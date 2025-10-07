@@ -58,11 +58,27 @@ module.exports.routes = {
    * Manage properties for users and listing them publicly.
    ***************************************************************************/
 
+
+  // Property APIs
   [`POST ${API_PREFIX}/property/add`]: 'PropertyController.add',
-  [`POST ${API_PREFIX}/property/upload-image`]: 'PropertyController.uploadImage',
-  [`GET ${API_PREFIX}/property/my`]: 'PropertyController.myProperties',
+  // [`POST ${API_PREFIX}/property/upload/:id`]: 'PropertyController.uploadMedia',
   [`GET ${API_PREFIX}/property/list`]: 'PropertyController.list',
   [`GET ${API_PREFIX}/property/:id`]: 'PropertyController.detail',
+  [`PUT ${API_PREFIX}/property/update/:id`]: 'PropertyController.update',
+  [`GET ${API_PREFIX}/property/search`]: 'PropertyController.search',
+  [`GET ${API_PREFIX}/property/my`]: 'PropertyController.myProperties',
+
+  // Admin-only routes (use policy)
+  [`PUT ${API_PREFIX}/admin/property/approve/:id`]: {
+    controller: 'PropertyController',
+    action: 'approve',
+    policy: 'isAdmin',
+  },
+  [`PUT ${API_PREFIX}/admin/property/reject/:id`]: {
+    controller: 'PropertyController',
+    action: 'reject',
+    policy: 'isAdmin',
+  },
 
   /***************************************************************************
    * ADMIN ROUTES
