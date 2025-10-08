@@ -41,9 +41,14 @@ module.exports.policies = {
     add: 'isAuthenticated',
     update: 'isAuthenticated',
     myProperties: 'isAuthenticated',
+    delete: 'isAuthenticated',
     list: true,
     detail: true,
     uploadImage: 'isAuthenticated',
   },
 
+
+  FavoriteController: {
+    '*': 'isAuthenticated',
+  },
 };

@@ -266,6 +266,52 @@ module.exports = {
     }
   },
 
+  delete: async function (req, res) {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.json(ResponseService.fail('Unauthorized user.'));
+      }
+
+      const id = req.params.id;
+      if (!id) {
+        return res.json(ResponseService.fail('Property ID is required.'));
+      }
+
+      // Find the property
+      const property = await Property.findOne({ id });
+      if (!property) {
+        return res.json(ResponseService.fail('Property not found.'));
+      }
+
+      // Check ownership
+      if (property.owner !== userId) {
+        return res.json(ResponseService.fail('You are not authorized to delete this property.'));
+      }
+
+      // Delete media and video files (if stored)
+      const uploadDir = path.resolve(sails.config.appPath, 'assets/uploads/property');
+      if (property.media && Array.isArray(property.media)) {
+        for (const img of property.media) {
+          const imgPath = path.join(uploadDir, path.basename(img.url));
+          if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+        }
+      }
+
+      if (property.video && property.video.url) {
+        const videoPath = path.join(uploadDir, path.basename(property.video.url));
+        if (fs.existsSync(videoPath)) fs.unlinkSync(videoPath);
+      }
+
+      // Delete record
+      await Property.destroyOne({ id });
+
+      return res.json(ResponseService.success('Property deleted successfully.'));
+    } catch (err) {
+      sails.log.error('Delete Property Error:', err);
+      return res.json(ResponseService.fail('Server error: ' + err.message));
+    }
+  },
 
 
   /**
