@@ -11,7 +11,7 @@ module.exports = {
     city: { type: 'string', required: true },
     state: { type: 'string', required: true },
     pincode: { type: 'number', required: true },
-    status: { type: 'string', defaultsTo: 'pending' },
+    status: { type: 'string', isIn: ['pending', 'approved', 'rejected'], defaultsTo: 'pending' },
 
     // 🏠 Residential
     houseNo: { type: 'string', allowNull: true },

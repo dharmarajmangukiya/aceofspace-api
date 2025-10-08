@@ -45,6 +45,10 @@ module.exports.policies = {
     list: true,
     detail: true,
     uploadImage: 'isAuthenticated',
+    pendingList: ['isAuthenticated', 'isAdmin'], // custom policy for admin
+    updateStatus: ['isAuthenticated', 'isAdmin'] // custom policy for admin
+
+
   },
 
 
