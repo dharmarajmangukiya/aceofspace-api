@@ -19,29 +19,31 @@ module.exports.policies = {
 
   // '*': true,
 
-   // Public APIs (no token needed)
-    AuthController: {
-      '*': true,  // allow all by default
-      profile: 'isAuthenticated', // (if you want auth/profile here)
-    },
+  // Public APIs (no token needed)
+  AuthController: {
+    '*': true,  // allow all by default
+    profile: 'isAuthenticated', // (if you want auth/profile here)
+  },
 
-    // User APIs (require token)
-    UserController: {
-      '*': 'isAuthenticated',   // all actions need token
-      list: ['isAuthenticated', 'isAdmin'] // custom policy for admin
-    },
-    // Protect KYC routes
-    KycController: {
-      upload: 'isAuthenticated',   // users must be logged in
-      listPending: ['isAuthenticated', 'isAdmin'], // admin-only
-      updateStatus: ['isAuthenticated', 'isAdmin'] // admin-only
-    },
-    PropertyController: {
-      add: 'isAuthenticated',
-      myProperties: 'isAuthenticated',
-      list: true,
-      detail: true,
-      uploadImage: 'isAuthenticated',
-    },
+  // User APIs (require token)
+  UserController: {
+    '*': 'isAuthenticated',   // all actions need token
+    list: ['isAuthenticated', 'isAdmin'] // custom policy for admin
+  },
+  // Protect KYC routes
+  KycController: {
+    upload: 'isAuthenticated',   // users must be logged in
+    listPending: ['isAuthenticated', 'isAdmin'], // admin-only
+    updateStatus: ['isAuthenticated', 'isAdmin'] // admin-only
+  },
+
+  PropertyController: {
+    add: 'isAuthenticated',
+    update: 'isAuthenticated',
+    myProperties: 'isAuthenticated',
+    list: true,
+    detail: true,
+    uploadImage: 'isAuthenticated',
+  },
 
 };
