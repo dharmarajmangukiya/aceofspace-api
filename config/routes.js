@@ -65,20 +65,29 @@ module.exports.routes = {
   [`GET ${API_PREFIX}/property/list`]: 'PropertyController.list',
   [`GET ${API_PREFIX}/property/:id`]: 'PropertyController.detail',
   [`PUT ${API_PREFIX}/property/update/:id`]: 'PropertyController.update',
+  [`DELETE ${API_PREFIX}/property/:id`]: 'PropertyController.delete',
   [`GET ${API_PREFIX}/property/search`]: 'PropertyController.search',
   [`GET ${API_PREFIX}/property/my`]: 'PropertyController.myProperties',
 
+  // Favorite Properties APIs
+  [`POST ${API_PREFIX}/favorites/add`]: 'FavoriteController.add',
+  [`DELETE ${API_PREFIX}/favorites/remove`]: 'FavoriteController.remove',
+  [`GET ${API_PREFIX}/favorites/list`]: 'FavoriteController.list',
+
   // Admin-only routes (use policy)
-  [`PUT ${API_PREFIX}/admin/property/approve/:id`]: {
-    controller: 'PropertyController',
-    action: 'approve',
-    policy: 'isAdmin',
-  },
-  [`PUT ${API_PREFIX}/admin/property/reject/:id`]: {
-    controller: 'PropertyController',
-    action: 'reject',
-    policy: 'isAdmin',
-  },
+
+  [`PUT ${API_PREFIX}/admin/property/approve/:id`]: 'PropertyController.approve',
+
+  // [`PUT ${API_PREFIX}/admin/property/approve/:id`]: {
+  //   controller: 'PropertyController',
+  //   action: 'approve',
+  //   policy: 'isAdmin',
+  // },
+  // [`PUT ${API_PREFIX}/admin/property/reject/:id`]: {
+  //   controller: 'PropertyController',
+  //   action: 'reject',
+  //   policy: 'isAdmin',
+  // },
 
   /***************************************************************************
    * ADMIN ROUTES
