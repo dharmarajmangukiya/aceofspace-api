@@ -76,7 +76,10 @@ module.exports.routes = {
 
   // Admin-only routes (use policy)
 
-  [`PUT ${API_PREFIX}/admin/property/approve/:id`]: 'PropertyController.approve',
+  [`GET ${API_PREFIX}/admin/property/pending`]: 'PropertyController.pendingList',
+  [`GET ${API_PREFIX}/admin/property/status/:id`]: 'PropertyController.updateStatus',
+
+
 
   // [`PUT ${API_PREFIX}/admin/property/approve/:id`]: {
   //   controller: 'PropertyController',

@@ -318,34 +318,77 @@ module.exports = {
    * @route PUT /api/admin/property/approve/:id
    * @desc Admin approval for property
    */
-  approve: async function (req, res) {
+
+  pendingList: async function (req, res) {
     try {
-      const id = req.params.id;
-      const property = await Property.updateOne({ id }).set({ status: 'approved' });
-      if (!property) return res.json(ResponseService.fail('Property not found.'));
-      return res.json(ResponseService.success('Property approved successfully.', property));
-    } catch (err) {
-      sails.log.error('Property Approval Error:', err);
-      return res.json(ResponseService.fail('Server error: ' + err.message));
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      const [properties, total] = await Promise.all([
+        Property.find({ status: 'pending' })
+          .populate('owner') //  correct relation field
+          .skip(skip)
+          .limit(limit)
+          .sort('createdAt DESC'),
+
+        Property.count({ status: 'pending' }),
+      ]);
+
+      return res.json({
+        status: 1,
+        message: 'Pending properties fetched successfully',
+        data: properties,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      });
+    } catch (error) {
+      sails.log.error('Error fetching pending properties:', error);
+      return res.json({
+        status: 0,
+        message: 'Error fetching pending properties',
+        error,
+      });
     }
   },
 
-  /**
-   * @route PUT /api/admin/property/reject/:id
-   * @desc Admin rejects property
-   */
-  reject: async function (req, res) {
+  updateStatus: async function (req, res) {
     try {
-      const id = req.params.id;
-      const { remark } = req.body;
-      const property = await Property.updateOne({ id }).set({ status: 'rejected', remark });
-      if (!property) return res.json(ResponseService.fail('Property not found.'));
-      return res.json(ResponseService.success('Property rejected successfully.', property));
+      const propertyId = req.params.id;
+
+      // Read status from multiple possible sources (JSON, form-data, query)
+      const status =
+        req.body?.status ||
+        req.param('status') ||
+        (req.allParams() && req.allParams().status);
+
+      if (!status) {
+        return res.json(ResponseService.fail('Missing status field.'));
+      }
+
+      if (!['approved', 'rejected'].includes(status)) {
+        return res.json(ResponseService.fail("Invalid status. Use 'approved' or 'rejected'."));
+      }
+
+      const property = await Property.findOne({ id: propertyId });
+      if (!property) {
+        return res.json(ResponseService.fail('Property not found.'));
+      }
+
+      await Property.updateOne({ id: propertyId }).set({ status });
+
+      return res.json(ResponseService.success(`Property ${status} successfully.`));
     } catch (err) {
-      sails.log.error('Property Reject Error:', err);
-      return res.json(ResponseService.fail('Server error: ' + err.message));
+      sails.log.error('Admin Property Status Update Error:', err);
+      return res.json(ResponseService.fail('Error updating property status: ' + err.message));
     }
   },
+
+
 };
 
 
