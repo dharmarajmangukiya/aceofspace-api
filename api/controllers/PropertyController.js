@@ -96,8 +96,8 @@ module.exports = {
               const video = videoFiles[0];
               const ext = path.extname(video.filename).toLowerCase();
               if (ext !== '.mp4') return reject(new Error('Only MP4 videos are allowed.'));
-              if (video.size > 400 * 1024 * 1024)
-                return reject(new Error('Video must be ≤ 400MB.'));
+              if (video.size > 50 * 1024 * 1024)
+                return reject(new Error('Video must be ≤ 50MB.'));
 
               videoPath = '/uploads/property/' + path.basename(video.fd);
             }
@@ -151,12 +151,80 @@ module.exports = {
    * @route GET /api/property/list
    * @desc Get approved property listings (public)
    */
+
   list: async function (req, res) {
     try {
-      const list = await Property.find({ status: 'approved' }).populate('owner').sort('createdAt DESC');
-      return res.json(ResponseService.success('Property list fetched successfully.', list));
+      const userId = req.user ? req.user.id : null;
+      let { page, limit, search, sort } = req.query;
+
+      // Default pagination
+      page = parseInt(page) > 0 ? parseInt(page) : 1;
+      limit = parseInt(limit) > 0 ? parseInt(limit) : 10;
+
+      const skip = (page - 1) * limit;
+
+
+      let where = {};
+      if (search) {
+        const isNumeric = !isNaN(search);
+
+        where.or = [
+          { title: { contains: search } },
+          { description: { contains: search } },
+          { address: { contains: search } },
+          { city: { contains: search } },
+          { area: { contains: search } },
+          { state: { contains: search } },
+          { propertyType: { contains: search } },
+          { subType: { contains: search } },
+          { landmark: { contains: search } },
+          { apartmentName: { contains: search } },
+          { houseNo: { contains: search } },
+        ];
+
+        if (isNumeric) {
+          where.or.push({ pincode: Number(search) });
+          where.or.push({ expectedRent: Number(search) });
+          where.or.push({ maintenance: Number(search) });
+        }
+      }
+
+
+      // Sorting (default = latest)
+      let sortOption = 'createdAt DESC';
+      if (sort === 'price_low') sortOption = 'price ASC';
+      else if (sort === 'price_high') sortOption = 'price DESC';
+
+      // Fetch properties (only approved)
+      const [list, total] = await Promise.all([
+        Property.find({ where: { ...where, status: 'approved' } })
+          .populate('owner')
+          .sort(sortOption)
+          .skip(skip)
+          .limit(limit),
+        Property.count({ where: { ...where, status: 'approved' } })
+      ]);
+
+      // If logged in → mark favourites
+      if (userId) {
+        const favList = await Favourite.find({ user: userId });
+        const favIds = favList.map(f => f.property);
+        list.forEach(p => (p.isFavorite = favIds.includes(p.id)));
+      } else {
+        list.forEach(p => (p.isFavorite = false));
+      }
+
+
+      return res.json(ResponseService.success('Property list fetched successfully.', {
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+        limit,
+        list
+      }));
+
     } catch (err) {
-      sails.log.error('Property List Error:', err);
+      sails.log.error('Property List Fetch Error:', err);
       return res.json(ResponseService.fail('Server error: ' + err.message));
     }
   },
