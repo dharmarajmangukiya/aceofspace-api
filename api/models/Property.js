@@ -13,7 +13,7 @@ module.exports = {
     pincode: { type: 'number', required: true },
     status: { type: 'string', isIn: ['pending', 'approved', 'rejected'], defaultsTo: 'pending' },
 
-    // 🏠 Residential
+    // Residential
     houseNo: { type: 'string', allowNull: true },
     apartmentName: { type: 'string', allowNull: true },
     area: { type: 'string', allowNull: true },
@@ -46,7 +46,7 @@ module.exports = {
     facing: { type: 'string', allowNull: true },
     facingDetails: { type: 'string', allowNull: true },
 
-    // 🏢 Commercial
+    // Commercial
     areaFromGoogle: { type: 'string', allowNull: true },
     officeNo: { type: 'string', allowNull: true },
     buildingName: { type: 'string', allowNull: true },
